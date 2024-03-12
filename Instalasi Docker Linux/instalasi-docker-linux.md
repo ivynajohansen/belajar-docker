@@ -19,17 +19,19 @@ Setelah repositori Docker siap, lanjut dengan menjalankan perintah berikut untuk
 
 # Langkah 3: Konfirm Instalasi
 
-Cek versi Docker
+Setelah menginstal Docker CE dan paket terkait, verifikasi bahwa instalasi telah berhasil dengan memeriksa versi Docker. Perintah ini akan menampilkan versi Docker yang terinstal, bersama dengan informasi lain tentang klien dan server Docker.
 
 `sudo docker version`
 
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/20715d73-6bc5-4143-bb69-0c5c36279dd0)
 
-Untuk start Docker, gunakan perintah berikut:
+Sebelum menjalankan container Docker, service Docker perlu di-start. Gunakan perintah berikut untuk memulai service Docker:
 
 `sudo systemctl start docker`
 
-Pastikan bahwa instalasi Docker Engine berhasil dengan menjalankan image hello-world.
+Perintah ini akan memulai service Docker di sistem CentOS. Kita juga dapat mengaktifkan layanan Docker untuk memulai secara otomatis saat boot dengan menjalankan `sudo systemctl enable docker`
+
+Untuk testing instalasi Docker, jalankan container sederhana yang mencetak pesan "Hello from Docker!". Gunakan perintah berikut untuk menjalankan container hello-world:
 
 `sudo docker run hello-world`
 
