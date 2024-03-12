@@ -49,14 +49,14 @@ version: '3.3'
 services:
   mysql:
     image: mysql:latest
+    command: --default-authentication-plugin=mysql_native_password
     container_name: mysql-container
     restart: always
     environment:
-      MYSQL_USER: mysql
-      MYSQL_PASSWORD: welcomemysql
       MYSQL_DATABASE: Product
+      MYSQL_ROOT_PASSWORD: welcomemysql
     ports:
-      - "3306:3306"
+      - "8306:3306"
 
   postgres:
     image: postgres:latest
@@ -72,8 +72,7 @@ services:
 
 Save perubahan file dengan `wq!`
 
-![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/07a6a569-0885-4705-906a-ec6bfcdf12a2)
-
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/89f64069-904d-43eb-90ca-cbab3269532e)
 
 ### Langkah 5: Start Container
 
@@ -87,8 +86,75 @@ Setelah mengisi file docker-compose.yml, jalankan perintah berikut untuk memulai
 
 Untuk memastikan port dapat diakses di luar server, konfigurasi firewall untuk mengizinkan traffic masuk pada port 3306 (MySQL) dan 5432 (PostgreSQL). Perintahnya bergantung pada pengaturan firewall Anda.
 
+### 3. Pembuatan Database di MySQL
 
+Install klien MySQL di CentOS menggunakan `sudo yum install mysql`
 
+Setelah klien MySQL terinstal, konek ke kontainer MySQL menggunakan alamat IP atau nama hostnya. Karena kita menggunakan Docker Compose, gunakan nama service yang ditentukan di docker-compose.yml, yaitu mysql.
+
+`mysql -h 172.17.0.1 -P 3306 -u mysql -pwelcomemysql`
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/d8d08c6a-0e98-433b-a55f-053a7f88bdd5)
+
+Jika koneksi berhasil, tampilan akan muncul seperti pada gambar di atas. Untuk output list database yang ada, gunakan perintah berikut:
+
+`SHOW DATABASES;`
+
+Untuk menggunakan database yang ditentukan di docker-compose.yml, yaitu Product:
+
+`USE Product`
+
+Di Database Product, kita akan membuat 3 table: products, product_types, dan shops. Pertama, buat table product_types yang memiliki id dan nama
+
+```
+CREATE TABLE product_types (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+```
+
+Selanjutnya, buat table shops yang memiliki id dan nama
+
+```
+CREATE TABLE shop (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+```
+
+Terakhir, buat table products yang memiliki id, nama, harga, product_type, dan shop
+
+```
+CREATE TABLE products (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    product_type_id INT,
+    shop_id INT,
+    FOREIGN KEY (product_type_id) REFERENCES product_types(id),
+    FOREIGN KEY (shop_id) REFERENCES shop(id)
+);
+```
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/3b15c788-5c89-4d52-be3f-de2451ab2d4f)
+
+Insert data ke table menggunakan perintah berikut:
+
+```
+INSERT INTO product_types (name) VALUES ('Fruits');
+INSERT INTO shop (name) VALUES ('Indomerat');
+INSERT INTO products (name, price, product_type_id, shop_id) VALUES ('Apel', 10000, 1, 1);
+```
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/c71e7d10-9731-47e9-91e4-c750bc3d6ead)
+
+Cek hasil dari pembuatan table dengan `SHOW TABLES`. Perintah ini akan mencantum semua table dalam database.
+Untuk melihat schema dari suatu table, gunakan `DESCRIBE`. Contohnya, `DESCRIBE products;`
+Untuk melihat isi tabel, gunakan `SELECT`. Misalnya, untuk melihat semua baris di tabel produk:
+
+`SELECT * FROM products;`
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/f14c0b72-9e36-4a6c-8934-79c531619c51)
 
 
 
