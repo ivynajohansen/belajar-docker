@@ -1,11 +1,36 @@
 # Instalasi Docker
-1. `sudo yum check-update` digunakan untuk memeriksa pembaruan paket yang tersedia untuk sistem yang menjalankan CentOS. Sebelum instalasi Docker, ini direkomendasikan untuk memastikan bahwa sistem menggunakan versi terbaru dari paket yang diperlukan oleh Docker dan untuk memastikan kompatibilitas dengan sistem yang ada. Hal ini juga dapat membantu dalam mencegah konflik versi atau masalah lain yang mungkin timbul selama instalasi.
-   ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/0eec7ecc-44b6-488c-9c9d-4fe35f09918b)
-2. `sudo yum install docker` digunakan untuk menginstal Docker pada sistem yang menjalankan CentOS dengan mengunduh dan menginstal paket-paket yang diperlukan untuk menjalankan Docker, sehingga dapat mulai menggunakan Docker untuk mengelola kontainer pada sistem.
-   ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/a434c62b-fc18-4610-923c-c713b5202ee0)
+# Langkah 1: Install package dan set up repository
+Untuk menginstal Docker di CentOS, paket `yum-utils` harus diinstal terlebih dahulu, yang menyediakan utilitas `yum-config-manager`. Utilitas ini digunakan untuk menambahkan repositori Docker ke sistem.
 
-3. `sudo systemctl start docker` digunakan untuk start service Docker pada sistem yang menjalankan CentOS.
-   ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/0aefc247-3c26-47aa-bff7-4f1edb409122)
+`sudo yum install -y yum-utils`
 
-5. `sudo systemctl enable docker` digunakan untuk mengaktifkan service Docker agar otomatis di-start saat sistem boot.
-6. `docker --version` digunakan untuk menampilkan versi Docker yang terinstal pada sistem tanpa perlu masuk ke dalam kontainer atau menjalankan perintah Docker lainnya.
+Selanjutnya, gunakan perintah yum-config-manager untuk menambahkan repositori Docker ke sistem CentOS. Repositori ini memungkinkan untuk menginstal Docker Community Edition (CE).
+
+`sudo yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo`
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/a41593c9-1013-4970-ac26-80e095d34acb)
+
+# Langkah 2: Install Docker Engine
+Setelah repositori Docker siap, lanjut dengan menjalankan perintah berikut untuk menginstal versi terbaru Docker Engine, containerd Docker Compose:
+
+`sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin`
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/d9cd8414-5d33-4b53-a832-40ad83776851)
+
+# Langkah 3: Konfirm Instalasi
+
+Cek versi Docker
+
+`sudo docker version`
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/20715d73-6bc5-4143-bb69-0c5c36279dd0)
+
+Untuk start Docker, gunakan perintah berikut:
+
+`sudo systemctl start docker`
+
+Pastikan bahwa instalasi Docker Engine berhasil dengan menjalankan image hello-world.
+
+`sudo docker run hello-world`
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/17cba369-b03d-4f7c-a23f-30cdd90d27f9)
