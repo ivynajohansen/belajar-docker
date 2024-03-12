@@ -1,5 +1,5 @@
 # Instalasi Docker
-# Langkah 1: Install package dan set up repository
+## Langkah 1: Install package dan set up repository
 Untuk menginstal Docker di CentOS, paket `yum-utils` harus diinstal terlebih dahulu, yang menyediakan utilitas `yum-config-manager`. Utilitas ini digunakan untuk menambahkan repositori Docker ke sistem.
 
 `sudo yum install -y yum-utils`
@@ -10,14 +10,14 @@ Selanjutnya, gunakan perintah yum-config-manager untuk menambahkan repositori Do
 
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/a41593c9-1013-4970-ac26-80e095d34acb)
 
-# Langkah 2: Install Docker Engine
+## Langkah 2: Install Docker Engine
 Setelah repositori Docker siap, lanjut dengan menjalankan perintah berikut untuk menginstal versi terbaru Docker Engine, containerd Docker Compose:
 
 `sudo yum install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin`
 
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/d9cd8414-5d33-4b53-a832-40ad83776851)
 
-# Langkah 3: Konfirm Instalasi
+## Langkah 3: Konfirm Instalasi
 
 Setelah menginstal Docker CE dan paket terkait, verifikasi bahwa instalasi telah berhasil dengan memeriksa versi Docker. Perintah ini akan menampilkan versi Docker yang terinstal, bersama dengan informasi lain tentang klien dan server Docker.
 
