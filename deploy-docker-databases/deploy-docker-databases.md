@@ -86,9 +86,12 @@ Setelah mengisi file docker-compose.yml, jalankan perintah berikut untuk memulai
 
 Untuk memastikan port dapat diakses di luar server, konfigurasi firewall untuk mengizinkan traffic masuk pada port 3306 (MySQL) dan 5432 (PostgreSQL). Perintahnya bergantung pada pengaturan firewall Anda.
 
-### 3. Pembuatan Database di MySQL
+## 3. Pembuatan Database di MySQL
 
+### Langkah 1: Install Klien MySQL
 Install klien MySQL di CentOS menggunakan `sudo yum install mysql`
+
+### Langkah 2: Konek ke kontainer MySQL
 
 Setelah klien MySQL terinstal, konek ke kontainer MySQL menggunakan alamat IP atau nama hostnya. Karena kita menggunakan Docker Compose, gunakan nama service yang ditentukan di docker-compose.yml, yaitu mysql.
 
@@ -96,7 +99,11 @@ Setelah klien MySQL terinstal, konek ke kontainer MySQL menggunakan alamat IP at
 
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/d8d08c6a-0e98-433b-a55f-053a7f88bdd5)
 
-Jika koneksi berhasil, tampilan akan muncul seperti pada gambar di atas. Untuk output list database yang ada, gunakan perintah berikut:
+Jika koneksi berhasil, tampilan akan muncul seperti pada gambar di atas. 
+
+### Langkah 3: Buat Table
+
+Untuk output list database yang ada, gunakan perintah berikut:
 
 `SHOW DATABASES;`
 
@@ -138,6 +145,8 @@ CREATE TABLE products (
 
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/3b15c788-5c89-4d52-be3f-de2451ab2d4f)
 
+### Langkah 4: Insert data ke table
+
 Insert data ke table menggunakan perintah berikut:
 
 ```
@@ -156,7 +165,64 @@ Untuk melihat isi tabel, gunakan `SELECT`. Misalnya, untuk melihat semua baris d
 
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/f14c0b72-9e36-4a6c-8934-79c531619c51)
 
+## 4. Pembuatan Database di Postgre
 
+### Langkah 1: Konek ke container PostgreSQL
+Untuk konek ke container PostgreSQL menggunakan (CLI), gunakan psql dengan perintah berikut:
 
+`docker exec -it postgres-container psql -U postgres -d Product`
 
+Perintah ini menghubungkan ke database postgres yang bernama Product.
 
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/cf8422a9-5a6d-449b-8fec-78f0f5ba7258)
+
+### Langkah 2: Tambah Table
+
+Seperti yang dilakukan di Database MySQL, tambah 3 table, yaitu, product_types, shops, dan products.
+
+```
+CREATE TABLE product_types (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+```
+
+```
+CREATE TABLE shops (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL
+);
+```
+
+```
+CREATE TABLE products (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    product_type_id INT NOT NULL,
+    shop_id INT NOT NULL,
+    FOREIGN KEY (product_type_id) REFERENCES product_types(id),
+    FOREIGN KEY (shop_id) REFERENCES shops(id)
+);
+```
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/f1761384-ba42-434a-a051-890930d57458)
+
+Jalankan `\dt` untuk melihat hasil buatan table. Perintah ini akan mencantum semua table dalam database.
+
+### Langkah 3: Insert data ke table
+
+Insert data ke table dengan perintah berikut:
+
+```
+INSERT INTO product_types (name) VALUES ('Electronics');
+INSERT INTO shops (name) VALUES ('Electronics Emporium');
+INSERT INTO products (name, price, product_type_id, shop_id) VALUES ('Smartphone', 3500999, 1, 1);
+```
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/641b6747-cc47-41ce-a6bd-fc4fca1a54bc)
+
+Untuk melihat schema dari suatu table, gunakan `\d`. Contohnya, `\d products;`
+Untuk melihat isi tabel, gunakan `SELECT`. Misalnya, untuk melihat semua baris di tabel produk:
+
+`SELECT * FROM products;`
