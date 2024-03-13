@@ -14,38 +14,44 @@ Setelah proyek Node.js dibuat, buat file yang akan berisi kode server Node.js:
 Isi file dengan kode:
 
 ```
-const http = require('http');
+const express = require('express');
 const mysql = require('mysql');
 
-const connection = mysql.createConnection({
-  host: 'mysql-container', // Use the container name
+const app = express();
+const port = 3000;
+
+const db = mysql.createConnection({
+  host: 'mysql-container',
   user: 'mysql',
   password: 'welcomemysql',
-  database: 'Product',
-  authPlugin: 'caching_sha2_password'
+  database: 'Product'
 });
 
-connection.connect((err) => {
+db.connect((err) => {
   if (err) {
-    console.error('Error connecting to MySQL:', err.stack);
+    console.error('Error connecting to MySQL database: ' + err.stack);
     return;
   }
-  console.log('Connected to MySQL as id', connection.threadId);
+  console.log('Connected to MySQL database as ID ' + db.threadId);
 });
 
-const server = http.createServer((req, res) => {
-  res.statusCode = 200;
-  res.setHeader('Content-Type', 'text/plain');
-  res.end('Hello World\n');
+app.get('/products', (req, res) => {
+  db.query('SELECT * FROM products', (err, result) => {
+    if (err) {
+      console.error('Error executing query: ' + err.stack);
+      res.status(500).json({ error: 'Internal Server Error' });
+      return;
+    }
+    res.json(result);
+  });
 });
 
-const PORT = process.env.PORT || 3000;
-server.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+app.listen(port, () => {
+  console.log(`API server listening at http://localhost:${port}`);
 });
 ```
 
-### Langkah 2: Add Dockerfile
+### Langkah 3: Add Dockerfile
 
 Di folder yang sama dengan docker-compose.yml dan server.js, gunakan perintah `touch Dockerfile` untuk membuat file Dockerfile, yang diisi dengan
 
@@ -85,6 +91,12 @@ services:
       - "3306:3306"
     networks:
       - node-network
+    volumes:
+      # Use this option to persist the MySQL DBs in a shared volume.
+      - ./mysqldata:/var/lib/mysql:rw,delegated
+      # Use this option to persist the MySQL DBs in a data volume.
+      # - db_data:/var/lib/mysql
+
 
   postgres:
     image: postgres:latest
