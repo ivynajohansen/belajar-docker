@@ -15,16 +15,18 @@ Isi file dengan kode:
 
 ```
 const express = require('express');
+const http = require('http');
 const mysql = require('mysql');
 
 const app = express();
 const port = 3000;
 
 const db = mysql.createConnection({
-  host: 'mysql-container',
+  host: '172.18.46.245',
   user: 'mysql',
   password: 'welcomemysql',
-  database: 'Product'
+  database: 'Product',
+  authPlugin: 'mysql_native_password'
 });
 
 db.connect((err) => {
@@ -38,7 +40,7 @@ db.connect((err) => {
 app.get('/products', (req, res) => {
   db.query('SELECT * FROM products', (err, result) => {
     if (err) {
-      console.error('Error executing query: ' + err.stack);
+      console.error('Error querying products: ' + err.stack);
       res.status(500).json({ error: 'Internal Server Error' });
       return;
     }
@@ -46,9 +48,12 @@ app.get('/products', (req, res) => {
   });
 });
 
-app.listen(port, () => {
-  console.log(`API server listening at http://localhost:${port}`);
+const server = http.createServer(app);
+
+server.listen(port, () => {
+  console.log(`API server listening at http://172.18.46.245:${port}`);
 });
+
 ```
 
 ### Langkah 3: Add Dockerfile
@@ -70,7 +75,12 @@ EXPOSE 3000
 CMD ["node", "server.js"]
 ```
 
-### Langkah 3: Add service API dan Network ke docker compose
+### Langkah 4: Add service API dan Network ke docker compose
+
+Build image untuk aplikasi Node.js dengan perintah berikut:
+
+`docker build . -t app-nodejs`
+
 Update docker-compose.yml untuk memasukkan service API Node.js, dan tambahkan network supaya container MySQL dan API bisa saling terhubung.
 
 ```
@@ -86,7 +96,7 @@ services:
       MYSQL_USER: mysql
       MYSQL_PASSWORD: welcomemysql
       MYSQL_ROOT_PASSWORD: welcomemysql
-      MYSQL_AUTHENTICATION_PLUGIN: caching_sha2_password
+      MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
     ports:
       - "3306:3306"
     networks:
@@ -110,25 +120,134 @@ services:
       - "5432:5432"
 
   nodejs-api:
-    build: .
+    image: app-nodejs
     container_name: nodejs-api-container
     restart: always
     ports:
       - '3000:3000'
-    networks:
-      - node-network
+    networks_mode: host
 
 networks:
   node-network:
     driver: bridge
 ```
 
-Setelah memperbarui Dockerfile dan docker-compose.yml, build image Docker dan jalankan container.
+### Langkah 5: Koneksi ke MySQL
+
+Supaya aplikasi Node.js bisa terhubung dengan MySQL yang menggunakan mysql_native_password, masuk ke root MySQL dan jalankan perintah ini:
 
 ```
-docker-compose up --build
+docker exec -it mysql-container bash
+mysql -uroot -p
+ALTER USER 'mysql'@'%' IDENTIFIED WITH mysql_native_password BY 'welcomemysql';
+FLUSH PRIVILEGES;
 ```
 
-### Langkah 4: Testing API
+### Langkah 6: Testing API
 
 Sekarang, API bisa di-test dengan mengakses http://172.18.46.245:3000/products di browser web Anda atau menggunakan alat seperti curl atau Postman.
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/9d3eb279-950c-4727-8219-33a3d0a6e36c)
+
+
+## 2. Python API
+### Langkah 1: Buat requirements.txt
+
+Buat txt file dengan `touch requirements.txt` untuk menentukan paket konektor Flask dan MySQL:
+
+```
+Flask
+mysql-connector-python
+```
+
+Lalu, install package yang diperlukan
+
+`pip install -r requirements.txt`
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/2cdebb83-b931-4c49-83fa-fc0aa742a91c)
+
+### Langkah 2: Buat app.py
+
+Buat file untuk aplikasi python dengan `touch app.py`
+
+```
+from flask import Flask, jsonify
+import mysql.connector
+
+app = Flask(__name__)
+
+@app.route('/products')
+def get_products():
+    connection = mysql.connector.connect(
+        host='172.18.46.245',
+        user='mysql',
+        password='welcomemysql',
+        database='Product',
+        auth_plugin='mysql_native_password'
+    )
+    cursor = connection.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM products')
+    products = cursor.fetchall()
+    cursor.close()
+    connection.close()
+    return jsonify(products)
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3001)
+```
+### Langkah 3: Buat Dockerfile
+
+Seperti pada Node.js, dalam directory yang sama, buat Dockerfile:
+
+```
+FROM python:3.9
+
+WORKDIR /usr/src/app
+
+COPY requirements.txt .
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . .
+
+EXPOSE 3000
+
+CMD ["python", "app.py"]
+```
+
+### Langkah 4: Docker Compose
+
+Build image untuk aplikasi Node.js dengan perintah berikut:
+
+`docker build . -t app-python`
+
+Tambahkan docker compose untuk aplikasi API Python
+
+```
+version: '3.3'
+
+services:
+  python-api:
+    image: app-python
+    container_name: python-api-container
+    restart: always
+    ports:
+      - "3001:3001"
+    environment:
+      - MYSQL_HOST=172.18.46.245
+      - MYSQL_USER=mysql
+      - MYSQL_PASSWORD=welcomemysql
+      - MYSQL_DATABASE=Product
+    network_mode: "host"
+```
+
+### Langkah 5: Testing API
+
+Sekarang, API bisa di-test dengan mengakses http://172.18.46.245:3001/products di browser web Anda atau menggunakan alat seperti curl atau Postman.
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/b2af6dc6-1a68-4807-a301-36d1bba5c7d3)
+
+
+
+
+
