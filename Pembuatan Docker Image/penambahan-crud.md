@@ -315,7 +315,225 @@ server.listen(port, () => {
 
 ## Python
 
+### Langkah 1: Buat Router
+Buat folder `routes` untuk menyimpan file Router untuk products, shop, dan product_type
+
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/f10360cd-ef77-4b58-9c1f-a140f8e7c52c)
+
+Isi kode productsRoute.py untuk menangani request-request GET, POST, PUT, dan DELETE
+
+```
+from flask import Blueprint, jsonify, request
+
+products_bp = Blueprint('products', __name__)
+db = None
+
+@products_bp.route('/', methods=['GET'])
+def get_products():
+    # Handle GET request for /products
+    cursor = db.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM products')
+    products = cursor.fetchall()
+    cursor.close()
+    return jsonify(products)
+
+@products_bp.route('/', methods=['POST'])
+def create_product():
+    # Handle POST request for creating a product
+    data = request.json
+    name = data.get('name')
+    price = data.get('price')
+    shop_id = data.get('shop_id')
+    product_type_id = data.get('product_type_id')
+    # Insert the new product into the database
+    cursor = db.cursor()
+    cursor.execute('INSERT INTO products (name, price, shop_id, product_type_id) VALUES (%s, %s, %s, %s)',
+                   (name, price, shop_id, product_type_id))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Product created successfully'), 201
+
+@products_bp.route('/<int:product_id>', methods=['PUT'])
+def edit_product(product_id):
+    # Handle PUT request for editing a product
+    data = request.json
+    name = data.get('name')
+    price = data.get('price')
+    shop_id = data.get('shop_id')
+    product_type_id = data.get('product_type_id')
+    # Update the product in the database
+    cursor = db.cursor()
+    cursor.execute('UPDATE products SET name=%s, price=%s, shop_id=%s, product_type_id=%s WHERE id=%s',
+                   (name, price, shop_id, product_type_id, product_id))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Product updated successfully')
+
+@products_bp.route('/<int:product_id>', methods=['DELETE'])
+def delete_product(product_id):
+    # Handle DELETE request for deleting a product
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM products WHERE id=%s', (product_id,))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Product deleted successfully')
+
+def set_db_products(connection):
+    global db
+    db = connection
+```
+
+Isi kode productTypesRoute.py untuk menangani request-request GET, POST, PUT, dan DELETE
+
+```
+from flask import Blueprint, jsonify, request
+
+product_types_bp = Blueprint('products_types', __name__)
+db = None
+
+@product_types_bp.route('/', methods=['GET'])
+def get_product_types():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM product_types')
+    product_types = cursor.fetchall()
+    cursor.close()
+    return jsonify(product_types)
+
+@product_types_bp.route('/', methods=['POST'])
+def create_product_type():
+    data = request.json
+    name = data.get('name')
+    cursor = db.cursor()
+    cursor.execute('INSERT INTO product_types (name) VALUES (%s)',
+                   (name,))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Product type created successfully'), 201
+
+@product_types_bp.route('/<int:product_type_id>', methods=['PUT'])
+def edit_product_type(product_type_id):
+    data = request.json
+    name = data.get('name')
+    # Update the product type in the database
+    cursor = db.cursor()
+    cursor.execute('UPDATE product_types SET name=%s WHERE id=%s',
+                   (name, product_type_id,))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Product type updated successfully')
+
+@product_types_bp.route('/<int:product_type_id>', methods=['DELETE'])
+def delete_product_type(product_type_id):
+    # Handle DELETE request for deleting a product type
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM product_types WHERE id=%s', (product_type_id,))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Product type deleted successfully')
+
+def set_db_product_types(connection):
+    global db
+    db = connection
+```
+
+Isi kode shopRoute.py untuk menangani request-request GET, POST, PUT, dan DELETE
+
+```
+from flask import Blueprint, jsonify, request
+
+shop_bp = Blueprint('shop', __name__)
+db = None
+
+@shop_bp.route('/', methods=['GET'])
+def get_shop():
+    cursor = db.cursor(dictionary=True)
+    cursor.execute('SELECT * FROM shop')
+    shop = cursor.fetchall()
+    cursor.close()
+    return jsonify(shop)
+
+@shop_bp.route('/', methods=['POST'])
+def create_shop():
+    data = request.json
+    name = data.get('name')
+    cursor = db.cursor()
+    cursor.execute('INSERT INTO shop (name) VALUES (%s)',
+                   (name,))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Shop created successfully'), 201
+
+@shop_bp.route('/<int:shop_id>', methods=['PUT'])
+def edit_shop(shop_id):
+    data = request.json
+    name = data.get('name')
+    # Update the product type in the database
+    cursor = db.cursor()
+    cursor.execute('UPDATE shop SET name=%s WHERE id=%s',
+                   (name, shop_id,))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Shop updated successfully')
+
+@shop_bp.route('/<int:shop_id>', methods=['DELETE'])
+def delete_shop(shop_id):
+    # Handle DELETE request for deleting a product type
+    cursor = db.cursor()
+    cursor.execute('DELETE FROM shop WHERE id=%s', (shop_id,))
+    db.commit()
+    cursor.close()
+    return jsonify(message='Shop deleted successfully')
+
+def set_db_shop(connection):
+    global db
+    db = connection
+```
+
+### Langkah 2: Update app.py
+
+Update app.py supaya menggunakan router-router yang telah dibuat sebelumnya.
+
+```
+from flask import Flask, jsonify, Blueprint, request
+import mysql.connector
+from routes.productsRoute import products_bp, set_db_products
+from routes.productTypesRoute import product_types_bp, set_db_product_types
+from routes.shopRoute import shop_bp, set_db_shop
+
+app = Flask(__name__)
+
+db = mysql.connector.connect(
+    host='172.18.46.245',
+    user='mysql',
+    password='welcomemysql',
+    database='Product'
+)
+
+set_db_products(db)
+set_db_product_types(db)
+set_db_shop(db)
+
+app.register_blueprint(products_bp, url_prefix='/products')
+app.register_blueprint(product_types_bp, url_prefix='/product-types')
+app.register_blueprint(shop_bp, url_prefix='/shops')
 
 
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=3001)
+```
+
+### Langkah 3: Testing
+
+1. GET - Display semua products
+   ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/c6e6be6d-71c3-480a-8605-95ffadc6028b)
+
+2. POST - Add product
+   ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/17763eaa-3120-403c-8b75-886ef6ce0ff1)
+
+3. PUT - Update product
+   ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/d0408bd7-ace5-4167-91cf-e2f152a312a1)
+
+4. DELETE - Delete product
+   ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/adf4e65b-5813-4451-9ba9-a82e2a673e97)
 
 
