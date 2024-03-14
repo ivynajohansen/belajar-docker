@@ -54,7 +54,10 @@ services:
     restart: always
     environment:
       MYSQL_DATABASE: Product
+      MYSQL_USER: mysql
+      MYSQL_PASSWORD: welcomemysql
       MYSQL_ROOT_PASSWORD: welcomemysql
+      MYSQL_AUTHENTICATION_PLUGIN: mysql_native_password
     ports:
       - "8306:3306"
 
