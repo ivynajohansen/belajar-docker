@@ -100,6 +100,10 @@ Setelah klien MySQL terinstal, konek ke kontainer MySQL menggunakan alamat IP at
 
 `mysql -h 172.17.0.1 -P 3306 -u mysql -pwelcomemysql`
 
+atau 
+
+`docker exec -it banking-mysql-container mysql -u mysql -pwelcomemysql`
+
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/d8d08c6a-0e98-433b-a55f-053a7f88bdd5)
 
 Jika koneksi berhasil, tampilan akan muncul seperti pada gambar di atas. 
