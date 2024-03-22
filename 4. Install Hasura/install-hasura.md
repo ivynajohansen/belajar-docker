@@ -10,7 +10,20 @@ Setelah itu, run container hasura
 
 ## 2. Connect ke Database Postgres
 
+Karena sebelumnya pernah membuat database postgres, ubah koneksi Postgres yang ada di docker-compose.yml menjadi:
 
+```
+HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:welcomepostgres@172.18.46.245:5433/Banking
+PG_DATABASE_URL: postgres://postgres:welcomepostgres@172.18.46.245:5433/Banking
+```
+
+Buka Hasura Console dengan menavigasi ke http://localhost:8080/console. Dari Konsol, klik tab Data:
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/a7c50e70-f8c7-47b6-b7f5-7eda4923d3bd)
+
+Pilih opsi Environment Variable dan ketik `PG_DATABASE_URL`:
+![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/d85a173b-071d-4e8d-90b1-51548c85720b)
+
+Setelah database masuk ke Hasura Console, jangan lupa untuk Track semua tables dan foreign keys.
 
 ## 3. Authorization dengan JWT Token
 
