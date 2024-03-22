@@ -41,7 +41,8 @@ Akses ke https://jwt.io/ dan gunakan format payload berikut:
 `
 
 Untuk bagian Signature, gunakan secret yang sama dengan HASURA_GRAPHQL_JWT_SECRET yang telah ditentukan sebelumnya.
-Jika di database memiliki permission berbeda-beda untuk berbagai role, bisa diatur di `x-hasura-allowed-roles`
+Jika di database memiliki permission table berbeda-beda untuk berbagai role, role bisa diatur di `x-hasura-allowed-roles`
+Untuk menambahkan permission table, di Hasura Console, pergi ke Data -> Pilih table -> Permissions
 
 ![image](https://github.com/ivynajohansen/belajar-docker/assets/83331802/e01c3d91-fa8b-4f49-ab70-6c314592b26f)
 
