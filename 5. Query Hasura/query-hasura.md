@@ -84,4 +84,43 @@ mutation {
 
 ![image](https://github.com/ivynajohansen/belajar-docker-dan-hasura/assets/83331802/c9fbe69d-c0c2-49a6-a8c1-4ead29bf1916)
 
-##
+## Mutation: Update
+
+Untuk update user berdasarkan suatu column, contohnya user_id, gunakan query update_users:
+
+```
+mutation {
+  update_users(where: {user_id: {_eq: "13"}}, _set: {first_name: "Johnnie", last_name: "Dong", email: "johnnie.dong@gmail.com"}) {
+    affected_rows
+    returning {
+      user_id
+      first_name
+      last_name
+      email
+    }
+  }
+}
+```
+
+![image](https://github.com/ivynajohansen/belajar-docker-dan-hasura/assets/83331802/557c19f5-21f9-4402-8937-18ac6990fbc3)
+
+Query di atas bisa digunakan ketika `where` menemukan row lebih dari satu yang memenuhi kondisi. Untuk update user berdasarkan primary key (user_id), gunakan update_users_by_pk.
+
+## Mutation: Delete
+
+Untuk delete user berdasarkan suatu column, contohnya last_name, gunakan query delete_users:
+
+```
+mutation {
+  delete_users(where: {last_name: {_eq: "Bolla"}}) {
+    affected_rows
+    returning {
+      user_id
+    }
+  }
+}
+```
+
+![image](https://github.com/ivynajohansen/belajar-docker-dan-hasura/assets/83331802/e84f20a9-4b99-41e0-bcd7-d8b400807d05)
+
+Query di atas menghapus semua data dimana last_name = "Bolla". Untuk menghapus 1 saja berdasarkan primary key (user_id), gunakan delete_users_by_pk.
