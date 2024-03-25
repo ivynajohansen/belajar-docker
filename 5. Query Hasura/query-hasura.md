@@ -1,5 +1,5 @@
 # Penggunaan Hasura
-## 1. Query Select Hasura
+## 1. Query: Select
 Untuk mengambil data dari table, contohnya table users, gunakan query yang memanggil table users serta column-column yang diinginkan:
 
 ```
@@ -14,7 +14,7 @@ Untuk mengambil data dari table, contohnya table users, gunakan query yang meman
 
 ![image](https://github.com/ivynajohansen/belajar-docker-dan-hasura/assets/83331802/3489b2df-ef99-4381-90d2-d1a7ed7a1879)
 
-## 2. Query Select JOIN WHERE
+## 2. Query: Select JOIN WHERE
 
 Untuk mencari data user dengan ID "1", beserta transaksaksi yang dimilikinya, gunakan query berikut. Karena transaksi menggunakan table account sebagai foreign key, dan table account menggunakan users sebagai foreign key, maka di query masukkan ketiga table.
 
@@ -84,7 +84,7 @@ mutation {
 
 ![image](https://github.com/ivynajohansen/belajar-docker-dan-hasura/assets/83331802/c9fbe69d-c0c2-49a6-a8c1-4ead29bf1916)
 
-## Mutation: Update
+## 4. Mutation: Update
 
 Untuk update user berdasarkan suatu column, contohnya user_id, gunakan query update_users:
 
@@ -106,7 +106,7 @@ mutation {
 
 Query di atas bisa digunakan ketika `where` menemukan row lebih dari satu yang memenuhi kondisi. Untuk update user berdasarkan primary key (user_id), gunakan update_users_by_pk.
 
-## Mutation: Delete
+## 5. Mutation: Delete
 
 Untuk delete user berdasarkan suatu column, contohnya last_name, gunakan query delete_users:
 
