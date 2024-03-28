@@ -10,7 +10,7 @@ Setelah itu, run container hasura
 
 ## 2. Connect ke Database Postgres
 
-Karena sebelumnya pernah membuat database postgres, ubah koneksi Postgres yang ada di docker-compose.yml menjadi:
+Kalau sebelumnya pernah membuat database postgres, ubah koneksi Postgres yang ada di docker-compose.yml menjadi database yang ada:
 
 ```
 HASURA_GRAPHQL_METADATA_DATABASE_URL: postgres://postgres:welcomepostgres@172.18.46.245:5433/Banking
